@@ -5,7 +5,7 @@ import express from "express";
 import { v4 as uuidv4 } from "uuid";
 
 const app = express();
-const SERVER_PORT = 8080;
+const SERVER_PORT = 3001;
 
 app.use(cors({ origin: "*" }));
 app.use(express.json());
@@ -70,7 +70,6 @@ app.post("/api/signup", async (req, res) => {
 		const uid = uuidv4();
 
 		stmtInsertNewUser.run(uid, username, hashedPassword);
-
 		res.status(201).json({ message: "User created successfully." });
 	} catch (error) {
 		console.error("Error creating user:", error);
