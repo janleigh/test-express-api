@@ -9,12 +9,11 @@
 		"format:check": "prettier --check .",
 		"start": "node server.js"
 	},
-	"keywords": [],
 	"author": {
 		"name": "Jan Leigh Muñoz",
 		"email": "janleigh@pm.me"
 	},
-	"license": "ISC",
+	"license": "MIT",
 	"dependencies": {
 		"bcrypt": "^6.0.0",
 		"better-sqlite3": "^12.2.0",
