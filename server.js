@@ -12,26 +12,22 @@ app.use(express.json());
 
 const db = new Database("database.db");
 
-db.exec(
-	`
-	CREATE TABLE IF NOT EXISTS users (
-		uid TEXT PRIMARY KEY,
-		username TEXT NOT NULL UNIQUE,
-		password TEXT NOT NULL UNIQUE
-	)
-
-	CREATE TABLE IF NOT EXISTS messages (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		uid TEXT NOT NULL,
-		message TEXT NOT NULL,
-		timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY (uid) REFERENCES users (uid)
-	)
-`,
-	(err) => {
-		err ?? console.error("Error creating users table:", err);
-	}
-);
+db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+        uid TEXT PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL UNIQUE
+    )
+`);
+db.exec(`
+    CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT NOT NULL,
+        message TEXT NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (uid) REFERENCES users (uid)
+    )
+`);
 
 const stmtFindUser = db.prepare("SELECT * FROM users WHERE username = ?");
 const stmtInsertNewUser = db.prepare(
