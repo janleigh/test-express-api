@@ -5,7 +5,7 @@ import express from "express";
 import { v4 as uuidv4 } from "uuid";
 
 const app = express();
-const SERVER_PORT = 3001;
+const SERVER_PORT = process.env.SERVER_PORT || 3001;
 
 app.use(cors({ origin: "*" }));
 app.use(express.json());
@@ -102,23 +102,23 @@ app.post("/api/login", async (req, res) => {
 app.get("/api/user/:userId", async (req, res) => {
 	const { userId } = req.params;
 
-	stmtGetUsernameFromUserId.get(userId, (err, row) => {
-		if (err) {
-			console.error("Error fetching user:", err);
-			return res
-				.status(500)
-				.json({ error: "Internal server error." });
-		}
+	try {
+		const r = stmtGetUsernameFromUserId.get(userId);
 
-		if (!row) {
+		if (!r) {
 			return res.status(404).json({ error: "User not found." });
 		}
 
-		res.status(200).json({ username: row.username });
-	});
+		res.status(200).json({ username: r.username });
+	} catch (err) {
+		console.error("Error fetching user:", err);
+		return res
+			.status(500)
+			.json({ error: "Internal server error." });
+	}
 });
 
-app.get("/api/send-message", async (req, res) => {
+app.post("/api/send-message", async (req, res) => {
 	const { recipientId, message } = req.body;
 
 	if (!recipientId || !message) {
@@ -127,21 +127,21 @@ app.get("/api/send-message", async (req, res) => {
 			.json({ error: "Recipient ID and message are required." });
 	}
 
-	stmtGetUserIdFromUserId.get(recipientId, (err, row) => {
-		if (err) {
-			console.error("Error fetching recipient:", err);
-			return res
-				.status(500)
-				.json({ error: "Internal server error." });
-		}
+	try {
+		const r = stmtGetUserIdFromUserId.get(recipientId);
 
-		if (!row) {
+		if (!r) {
 			return res.status(404).json({ error: "Recipient not found." });
 		}
 
 		stmtInsertMessages.run(recipientId, message);
 		res.status(201).json({ message: "Message sent successfully." });
-	});
+	} catch (err) {
+		console.error("Error fetching recipient:", err);
+		return res
+			.status(500)
+			.json({ error: "Internal server error." });
+	}
 });
 
 app.get("/api/messages/:userId", async (req, res) => {
